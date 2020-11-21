@@ -6,7 +6,6 @@
 
 #include <iostream>
 
-#include "imageloader.h"
 #pragma comment(lib, "glew32.lib")
 
 using namespace std;
@@ -62,7 +61,7 @@ Planet eur(.24, 4, 0, 4.40, 0, 0);         // Europa   (Jupiter)
 Planet gan(.24, 4.7, 0, 5.00, 0, 0);       // Ganymede (Jupiter)
 Planet cal(.24, 5.3, 0, 2.30, 0, 0);       // Callisto (Jupiter)
 Planet tit(.75, 3.7, 0, 2.40, 0, 0);       // Titan	   (Saturn)
-Planet nix(.10, 1.5, 0, 5.00, 0, 0);       // Nix	   (Pluto)
+Planet nix(.10, 1.5, 0, 5.00, 0, 0);       // Nix	      (Pluto)
 Planet puc(.26, 2.9, 0, 7.00, 0, 0);       // Puck	   (Uranus)
 Planet tri(.36, 3.2, 0, 3.40, 0, 0);       // Triton   (Neptune)
 
@@ -73,7 +72,7 @@ int moonsActive = 1;
 int changeCamera = 0;
 int frameCount = 0;
 int labelsActive = 0;
-int zoom = 50;
+int zoom = 60;
 int logoScene = 1;
 
 float lightPos[] = {0.0, 0.0, -75.0, 1.0};  // Spotlight position.
@@ -81,7 +80,7 @@ static float spotAngle = 40;                // Spotlight cone half-angle.
 float spotDirection[] = {1.0, 0.0, 0.0};    // Spotlight direction.
 static float spotExponent = 1.0;  // Spotlight exponent = attenuation factor.
 
-// Carrega uma textura de um arquivo
+// Função dos exemplos
 GLuint carregaTextura(const char* arquivo)
 {
     // cria um id para a textura
@@ -121,16 +120,6 @@ GLuint carregaTextura(const char* arquivo)
     return idTextura;
 }
 
-GLuint loadTexture(Image* image) {
-  // http://www.codeincodeblock.com/2012/05/simple-method-for-texture-mapping-on.html
-  GLuint textureId;
-  glGenTextures(1, &textureId);
-  glBindTexture(GL_TEXTURE_2D, textureId);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height, 0, GL_RGB,
-               GL_UNSIGNED_BYTE, image->pixels);
-  return textureId;
-}
-
 GLuint sunTexture, merTexture, venTexture, earTexture, marTexture, jupTexture,
     satTexture, uraTexture, nepTexture, pluTexture, staTexture, logTexture;
 
@@ -145,36 +134,21 @@ void setup(void) {
 
   // TEXUTRING SETUP
   glEnable(GL_NORMALIZE);
-  glEnable(GL_COLOR_MATERIAL);
-  // Image* sta = loadBMP("textures/stars.bmp");
-  // staTexture = loadTexture(sta); 
-  staTexture = carregaTextura("textures/stars.bmp");
-  Image* sun = loadBMP("textures/sun.bmp");
-  sunTexture = loadTexture(sun);  
-  Image* mer = loadBMP("textures/mercury.bmp");
-  merTexture = loadTexture(mer);  
-  Image* ven = loadBMP("textures/venus.bmp");
-  venTexture = loadTexture(ven);  
-  // MEU TESTE
-  // Image* ear = loadBMP("textures/earth.bmp");
-  // earTexture = loadTexture(ear);    
-  earTexture = carregaTextura("textures/earth.png");
-  // FIM TESTE
-  Image* mar = loadBMP("textures/mars.bmp");
-  marTexture = loadTexture(mar);  
-  Image* jup = loadBMP("textures/jupiter.bmp");
-  jupTexture = loadTexture(jup);  
-  Image* sat = loadBMP("textures/saturn.bmp");
-  satTexture = loadTexture(sat);  
-  Image* ura = loadBMP("textures/uranus.bmp");
-  uraTexture = loadTexture(ura);  
-  Image* nep = loadBMP("textures/neptune.bmp");
-  nepTexture = loadTexture(nep);  
-  Image* plu = loadBMP("textures/pluto.bmp");
-  pluTexture = loadTexture(plu);  
-  Image* log = loadBMP("textures/logo.bmp");
-  logTexture = loadTexture(log);  
+  glEnable(GL_COLOR_MATERIAL);  
+  staTexture = carregaTextura("solar-textures/png/stars_v2.png");
+  sunTexture = carregaTextura("solar-textures/png/sun.png");
+  merTexture = carregaTextura("solar-textures/png/mercury.png");  
+  venTexture = carregaTextura("solar-textures/png/venus.png");  
+  earTexture = carregaTextura("solar-textures/png/earth.png");
+  marTexture = carregaTextura("solar-textures/png/mars.png");
+  jupTexture = carregaTextura("solar-textures/png/jupiter.png");  
+  satTexture = carregaTextura("solar-textures/png/saturn.png");  
+  uraTexture = carregaTextura("solar-textures/png/uranus.png");
+  nepTexture = carregaTextura("solar-textures/png/neptune.png");
+  pluTexture = carregaTextura("textures/pluto.bmp");  
+  logTexture = carregaTextura("textures/logo.bmp");
 
+  // TODO: revisar
   // LIGHTING SETUP
   glEnable(GL_LIGHTING);
   float lightAmb[] = {0.0, 0.0, 0.0, 1.0};
@@ -239,7 +213,7 @@ void drawScene(void) {
   glLoadIdentity();
 
   if (changeCamera == 0)
-    gluLookAt(0.0, zoom, 50.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    gluLookAt(0.0, zoom, 65.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
   if (changeCamera == 1)
     gluLookAt(0.0, 0.0, zoom, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
   if (changeCamera == 2)
@@ -731,7 +705,7 @@ int main(int argc, char** argv) {
   glutInitContextProfile(GLUT_COMPATIBILITY_PROFILE);
 
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-  glutInitWindowSize(700, 700);
+  glutInitWindowSize(800, 600);
   glutInitWindowPosition(500, 0);
   glutCreateWindow("Solar System");
   glutDisplayFunc(drawScenesInOrder);

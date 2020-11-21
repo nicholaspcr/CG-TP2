@@ -72,13 +72,10 @@ int moonsActive = 1;
 int changeCamera = 0;
 int frameCount = 0;
 int labelsActive = 0;
-int zoom = 60;
-int logoScene = 1;
+int zoom = 50;
+int logoScene = 0;
 
-float lightPos[] = {0.0, 0.0, -75.0, 1.0};  // Spotlight position.
-static float spotAngle = 40;                // Spotlight cone half-angle.
-float spotDirection[] = {1.0, 0.0, 0.0};    // Spotlight direction.
-static float spotExponent = 1.0;  // Spotlight exponent = attenuation factor.
+
 
 // Função dos exemplos
 GLuint carregaTextura(const char* arquivo)
@@ -135,30 +132,27 @@ void setup(void) {
   // TEXUTRING SETUP
   glEnable(GL_NORMALIZE);
   glEnable(GL_COLOR_MATERIAL);  
-  staTexture = carregaTextura("solar-textures/png/stars_v2.png");
-  sunTexture = carregaTextura("solar-textures/png/sun.png");
-  merTexture = carregaTextura("solar-textures/png/mercury.png");  
-  venTexture = carregaTextura("solar-textures/png/venus.png");  
-  earTexture = carregaTextura("solar-textures/png/earth.png");
-  marTexture = carregaTextura("solar-textures/png/mars.png");
-  jupTexture = carregaTextura("solar-textures/png/jupiter.png");  
-  satTexture = carregaTextura("solar-textures/png/saturn.png");  
-  uraTexture = carregaTextura("solar-textures/png/uranus.png");
-  nepTexture = carregaTextura("solar-textures/png/neptune.png");
-  pluTexture = carregaTextura("textures/pluto.bmp");  
-  logTexture = carregaTextura("textures/logo.bmp");
+  staTexture = carregaTextura("textures/png/stars.png");
+  sunTexture = carregaTextura("textures/png/sun.png");
+  merTexture = carregaTextura("textures/png/mercury.png");  
+  venTexture = carregaTextura("textures/png/venus.png");  
+  earTexture = carregaTextura("textures/png/earth.png");
+  marTexture = carregaTextura("textures/png/mars.png");
+  jupTexture = carregaTextura("textures/png/jupiter.png");  
+  satTexture = carregaTextura("textures/png/saturn.png");  
+  uraTexture = carregaTextura("textures/png/uranus.png");
+  nepTexture = carregaTextura("textures/png/neptune.png");  
+  logTexture = carregaTextura("textures/png/stars.png");
 
-  // TODO: revisar
+
+  // TODO: isolate
   // LIGHTING SETUP
-  glEnable(GL_LIGHTING);
-  float lightAmb[] = {0.0, 0.0, 0.0, 1.0};
-  float lightDifAndSpec[] = {1.0, 1.0, 1.0, 1.0};
-  float globAmb[] = {0.5, 0.5, 0.5, 1.0};
-  glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmb);
-  glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDifAndSpec);
-  glLightfv(GL_LIGHT0, GL_SPECULAR, lightDifAndSpec);
-  glEnable(GL_LIGHT0);
-  glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globAmb);
+  float lightPos[] = {0.0, 0.0, -75.0, 1.0};  // Spotlight position.
+  static float spotAngle = 210;                // Spotlight cone half-angle.
+  float spotDirection[] = {0.0, 0.0, 0.0};    // Spotlight direction.
+  static float spotExponent = 2.0;  // Spotlight exponent = attenuation factor.
+  glEnable(GL_LIGHTING);  
+  glEnable(GL_LIGHT0);  
   glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
   glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
   glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
@@ -215,8 +209,6 @@ void drawScene(void) {
   if (changeCamera == 0)
     gluLookAt(0.0, zoom, 65.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
   if (changeCamera == 1)
-    gluLookAt(0.0, 0.0, zoom, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-  if (changeCamera == 2)
     gluLookAt(0.0, zoom, 0.00001, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
   if (bigOrbitActive == 1) orbitalTrails();
@@ -510,6 +502,8 @@ void drawScene(void) {
   }
   glPopMatrix();
 
+
+  // 
   glPushMatrix();
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, staTexture);
@@ -678,11 +672,7 @@ void keyInput(unsigned char key, int x, int y) {
     case '2':
       changeCamera = 1;
       glutPostRedisplay();
-      break;
-    case '3':
-      changeCamera = 2;
-      glutPostRedisplay();
-      break;
+      break;    
   }
 }
 
@@ -693,7 +683,7 @@ void intructions(void) {
   cout << "o to show/hide Small Orbital Trails." << endl;
   cout << "M/m to show/hide Moons." << endl;
   cout << "L/l to show/hide labels" << endl;
-  cout << "1, 2 and 3 to change camera angles." << endl;
+  cout << "1 or 2 to change camera angles." << endl;
   cout << "Scroll to change camera movement" << endl;
 }
 
@@ -705,7 +695,7 @@ int main(int argc, char** argv) {
   glutInitContextProfile(GLUT_COMPATIBILITY_PROFILE);
 
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-  glutInitWindowSize(800, 600);
+  glutInitWindowSize(1024, 768);
   glutInitWindowPosition(500, 0);
   glutCreateWindow("Solar System");
   glutDisplayFunc(drawScenesInOrder);

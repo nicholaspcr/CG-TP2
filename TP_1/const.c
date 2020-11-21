@@ -1,8 +1,0 @@
-#define LARGURA_DO_MUNDO 800
-#define ALTURA_DO_MUNDO 600
-#define VIDA_NAVE 3
-#define VELOC_NAVE 5
-#define QTD_INIMIGOS 21
-#define QTD_CHEFES 3
-#define VELOC_INIMIGO 5
-#define VELOC_TIRO 10

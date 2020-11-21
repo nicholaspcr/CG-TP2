@@ -1,6 +1,8 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+
 #include <GL/glext.h>
+#include <SOIL/SOIL.h>
 
 #include <iostream>
 
@@ -79,6 +81,46 @@ static float spotAngle = 40;                // Spotlight cone half-angle.
 float spotDirection[] = {1.0, 0.0, 0.0};    // Spotlight direction.
 static float spotExponent = 1.0;  // Spotlight exponent = attenuation factor.
 
+// Carrega uma textura de um arquivo
+GLuint carregaTextura(const char* arquivo)
+{
+    // cria um id para a textura
+    GLuint idTextura;
+    glGenTextures(1, &idTextura);
+    glBindTexture(GL_TEXTURE_2D, idTextura);
+
+    int largura, altura, canais;
+    unsigned char* texels = SOIL_load_image(arquivo, &largura, &altura, &canais, SOIL_LOAD_RGBA);
+
+    // inverte o eixo t (a SOIL_load_OGL_texture fazia isso automaticamente...)
+    for(int j = 0; j < altura / 2; j++ )
+    {
+        int index1 = j * largura * 4;
+        int index2 = (altura - 1 - j) * largura * canais;
+
+        for(int i = largura * canais; i > 0; i--)
+        {
+            unsigned char temp = texels[index1];
+            texels[index1] = texels[index2];
+            texels[index2] = temp;
+            ++index1;
+            ++index2;
+        }
+    }
+
+    // envia os texels da textura para a VRAM (memória da placa de vídeo_
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, largura, altura, 0, GL_RGBA,
+                 GL_UNSIGNED_BYTE, texels);
+
+    // libera a RAM que estava guardando a textura (já que ela já foi para a VRAM)
+    SOIL_free_image_data(texels);
+
+    if (texels == nullptr) {
+        printf("Erro do SOIL '%s' tentando carregar o arquivo '%s'.\n", SOIL_last_result(), arquivo);
+    }    
+    return idTextura;
+}
+
 GLuint loadTexture(Image* image) {
   // http://www.codeincodeblock.com/2012/05/simple-method-for-texture-mapping-on.html
   GLuint textureId;
@@ -104,16 +146,20 @@ void setup(void) {
   // TEXUTRING SETUP
   glEnable(GL_NORMALIZE);
   glEnable(GL_COLOR_MATERIAL);
-  Image* sta = loadBMP("textures/stars.bmp");
-  staTexture = loadTexture(sta);  
+  // Image* sta = loadBMP("textures/stars.bmp");
+  // staTexture = loadTexture(sta); 
+  staTexture = carregaTextura("textures/stars.bmp");
   Image* sun = loadBMP("textures/sun.bmp");
   sunTexture = loadTexture(sun);  
   Image* mer = loadBMP("textures/mercury.bmp");
   merTexture = loadTexture(mer);  
   Image* ven = loadBMP("textures/venus.bmp");
   venTexture = loadTexture(ven);  
-  Image* ear = loadBMP("textures/earth.bmp");
-  earTexture = loadTexture(ear);  
+  // MEU TESTE
+  // Image* ear = loadBMP("textures/earth.bmp");
+  // earTexture = loadTexture(ear);    
+  earTexture = carregaTextura("textures/earth.png");
+  // FIM TESTE
   Image* mar = loadBMP("textures/mars.bmp");
   marTexture = loadTexture(mar);  
   Image* jup = loadBMP("textures/jupiter.bmp");

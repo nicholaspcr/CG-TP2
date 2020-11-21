@@ -9,10 +9,6 @@ using namespace std;
 Image::Image(char* ps, int w, int h) : pixels(ps), width(w), height(h) {
 }
 
-Image::~Image() {
-	delete[] pixels;
-}
-
 namespace {
 	//Converts a four-character array to an integer, using little-endian form
 	int toInt(const char* bytes) {

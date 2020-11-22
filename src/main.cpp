@@ -10,11 +10,27 @@
 
 using namespace std;
 
-class Planet {
- public:
-  float radius, distance, orbit, orbitSpeed, axisTilt, axisAni;
-  Planet(float _radius, float _distance, float _orbit, float _orbitSpeed,
-         float _axisTilt, float _axisAni) {
+
+struct planet { 
+  float radius, distance, orbit, orbitSpeed, axisTilt, axisAni;  
+  // default values -> define
+  planet(){    
+    // talvez o sol como o padrão
+    radius = 5.0;
+    distance = 0.0;
+    orbit = 0.0;
+    orbitSpeed = 0.0;
+    axisTilt = 0.0;
+    axisAni = 0.0;
+  }
+  planet(
+    float _radius, 
+    float _distance,
+    float _orbit,
+    float _orbitSpeed,
+    float _axisTilt,
+    float _axisAni) 
+  {
     radius = _radius;
     distance = _distance;
     orbit = _orbit;
@@ -22,48 +38,43 @@ class Planet {
     axisTilt = _axisTilt;
     axisAni = _axisAni;
   }
-
-  void drawSmallOrbit(void) {
-    glPushMatrix();
-    glColor3ub(255, 255, 255);
-    glRotatef(90.0, 1.0, 0.0, 0.0);
-    glutWireTorus(0.001, distance, 100.0, 100.0);
-    glPopMatrix();
-  }
-
-  void drawMoon(void) {
-    GLUquadricObj* quadric;
-    quadric = gluNewQuadric();
-    glPushMatrix();
-    glColor3ub(255, 255, 255);
-    glRotatef(orbit, 0.0, 1.0, 0.0);
-    glTranslatef(distance, 0.0, 0.0);
-    gluSphere(quadric, radius, 20.0, 20.0);
-    glPopMatrix();
-  }
 };
 
-// Sun, Planets and Stars
-Planet sun(5.0, 0, 0, 0, 0, 0);            // Sun
-Planet mer(1.0, 7, 0, 4.74, 02.11, 0);     // Mercury
-Planet ven(1.5, 11, 0, 3.50, 177.0, 0);    // Venus
-Planet ear(2.0, 16, 0, 2.98, 23.44, 0);    // Earth
-Planet mar(1.2, 21, 0, 2.41, 25.00, 0);    // Mars
-Planet jup(3.5, 28, 0, 1.31, 03.13, 0);    // Jupiter
-Planet sat(3.0, 37, 0, 0.97, 26.70, 0);    // Saturn
-Planet ura(2.5, 45.5, 0, 0.68, 97.77, 0);  // Uranus
-Planet nep(2.3, 53.6, 0, 0.54, 28.32, 0);  // Neptune
-Planet plu(0.3, 59, 0, 0.47, 119.6, 0);    // Pluto
 
-int isAnimate = 0;
-int bigOrbitActive = 1;
-int smallOrbitActive = 1;
-int moonsActive = 1;
+// global variables
+int animation = 0;
+int orbitActive = 0;
 int changeCamera = 0;
-int frameCount = 0;
+int frames = 0;
 int labelsActive = 0;
-int zoom = 50;
-int logoScene = 0;
+int cameraDistance = 50;
+
+// Sun, Planets and Stars
+planet sun = planet();                              // Sun
+planet mer = planet(1.0, 7, 0, 4.74, 02.11, 0);     // Mercury
+planet ven = planet(1.5, 11, 0, 3.50, 177.0, 0);    // Venus
+planet ear = planet(2.0, 16, 0, 2.98, 23.44, 0);    // Earth
+planet mar = planet(1.2, 21, 0, 2.41, 25.00, 0);    // Mars
+planet jup = planet(3.5, 28, 0, 1.31, 03.13, 0);    // Jupiter
+planet sat = planet(3.0, 37, 0, 0.97, 26.70, 0);    // Saturn
+planet ura = planet(2.5, 45.5, 0, 0.68, 97.77, 0);  // Uranus
+planet nep = planet(2.3, 53.6, 0, 0.54, 28.32, 0);  // Neptune
+planet plu = planet(0.4, 59, 0, 0.47, 119.6, 0);    // Pluto
+
+// Texturas
+GLuint sunTexture;
+GLuint merTexture;
+GLuint venTexture;
+GLuint earTexture;
+GLuint marTexture;
+GLuint jupTexture;
+GLuint satTexture;
+GLuint uraTexture;
+GLuint nepTexture;
+GLuint pluTexture;
+GLuint staTexture;
+GLuint logTexture;
+
 
 // Função dos exemplos
 GLuint carregaTextura(const char* arquivo)
@@ -105,19 +116,17 @@ GLuint carregaTextura(const char* arquivo)
     return idTextura;
 }
 
-GLuint sunTexture, merTexture, venTexture, earTexture, marTexture, jupTexture,
-    satTexture, uraTexture, nepTexture, pluTexture, staTexture, logTexture;
-
-void writeBitmapString(void* font, char* string) {
-  char* c;
-  for (c = string; *c != '\0'; c++) glutBitmapCharacter(font, *c);
+// escreve string com glut escreve char
+void writeBitmapString(void* font, string str) {  
+  for(auto ch : str)
+    glutBitmapCharacter(font, ch);
 }
 
 void setup(void) {
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glEnable(GL_DEPTH_TEST);
 
-  // TEXUTRING SETUP
+  // Carrega texturas com função do exemplo
   glEnable(GL_NORMALIZE);
   glEnable(GL_COLOR_MATERIAL);  
   staTexture = carregaTextura("../textures/png/stars.png");
@@ -133,8 +142,7 @@ void setup(void) {
   logTexture = carregaTextura("../textures/png/stars.png");
 
 
-  // TODO: isolate
-  // LIGHTING SETUP
+  // TODO: Fix lights
   float lightPos[] = {0.0, 0.0, -75.0, 1.0};  // Spotlight position.
   static float spotAngle = 210;                // Spotlight cone half-angle.
   float spotDirection[] = {0.0, 0.0, 0.0};    // Spotlight direction.
@@ -149,6 +157,8 @@ void setup(void) {
   glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, spotExponent);
 }
 
+
+// Desenha o caminho dos planetas
 void orbitalTrails(void) {
   glPushMatrix();
   glColor3ub(255, 255, 255);
@@ -166,89 +176,86 @@ void orbitalTrails(void) {
   glPopMatrix();
 }
 
-void drawLogoScene(void) {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glLoadIdentity();
-
+void drawPlanet(planet p, GLuint texture, string planetName, GLUquadric *quad){  
+  glPushMatrix();
+  glRotatef(p.orbit, 0.0, 1.0, 0.0);
+  glTranslatef(p.distance, 0.0, 0.0);
+  if (labelsActive == 1) {
+    glRasterPos3f(-1.2, 7.0, 0.0);
+    glColor3ub(255, 255, 255);
+    writeBitmapString(GLUT_BITMAP_HELVETICA_12, planetName);
+  }  
+  glRotatef(p.axisTilt, 1.0, 0.0, 0.0);
+  glRotatef(p.axisAni, 0.0, 1.0, 0.0);
+  glRotatef(90.0, 1.0, 0.0, 0.0);
   glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, logTexture);
+  glBindTexture(GL_TEXTURE_2D, texture);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-  glBegin(GL_POLYGON);
-  glTexCoord2f(0.0, 0.0);
-  glVertex3f(-100, -100, -100);
-  glTexCoord2f(1.0, 0.0);
-  glVertex3f(100, -100, -100);
-  glTexCoord2f(1.0, 1.0);
-  glVertex3f(100, 100, -100);
-  glTexCoord2f(0.0, 1.0);
-  glVertex3f(-100, 100, -100);
-  glEnd();
-
-  glutSwapBuffers();
+  gluQuadricTexture(quad, 1);
+  gluSphere(quad, p.radius, 20.0, 20.0);
+  glDisable(GL_TEXTURE_2D);  
+  glPopMatrix();
 }
 
 void drawScene(void) {
-  frameCount++;
+  frames++;
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glLoadIdentity();
 
   if (changeCamera == 0)
-    gluLookAt(0.0, zoom, 65.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    gluLookAt(0.0, cameraDistance, 65.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
   if (changeCamera == 1)
-    gluLookAt(0.0, zoom, 0.00001, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    gluLookAt(0.0, cameraDistance, 0.00001, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
-  if (bigOrbitActive == 1) orbitalTrails();
+  if (orbitActive == 1) orbitalTrails();
 
   GLUquadric* quadric;
   quadric = gluNewQuadric();
 
   // Sun
-  glPushMatrix();
-  glRotatef(sun.orbit, 0.0, 1.0, 0.0);
-  glTranslatef(sun.distance, 0.0, 0.0);
-  if (labelsActive == 1) {
-    glRasterPos3f(-1.2, 7.0, 0.0);
-    glColor3ub(255, 255, 255);
-    writeBitmapString(GLUT_BITMAP_HELVETICA_12, "Sun");
-  }
-  glPushMatrix();
-  glRotatef(sun.axisTilt, 1.0, 0.0, 0.0);
-  glRotatef(sun.axisAni, 0.0, 1.0, 0.0);
-  glRotatef(90.0, 1.0, 0.0, 0.0);
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, sunTexture);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  gluQuadricTexture(quadric, 1);
-  gluSphere(quadric, sun.radius, 20.0, 20.0);
-  glDisable(GL_TEXTURE_2D);
-  glPopMatrix();
-  glPopMatrix();
+  drawPlanet(sun, sunTexture, "Sun", quadric);
+  // glPushMatrix();
+  // glRotatef(sun.orbit, 0.0, 1.0, 0.0);
+  // glTranslatef(sun.distance, 0.0, 0.0);
+  // if (labelsActive == 1) {
+  //   glRasterPos3f(-1.2, 7.0, 0.0);
+  //   glColor3ub(255, 255, 255);
+  //   writeBitmapString(GLUT_BITMAP_HELVETICA_12, "Sun");
+  // }  
+  // glRotatef(sun.axisTilt, 1.0, 0.0, 0.0);
+  // glRotatef(sun.axisAni, 0.0, 1.0, 0.0);
+  // glRotatef(90.0, 1.0, 0.0, 0.0);
+  // glEnable(GL_TEXTURE_2D);
+  // glBindTexture(GL_TEXTURE_2D, sunTexture);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  // gluQuadricTexture(quadric, 1);
+  // gluSphere(quadric, sun.radius, 20.0, 20.0);
+  // glDisable(GL_TEXTURE_2D);  
+  // glPopMatrix();
 
   // Mercury
-  glPushMatrix();
-  glRotatef(mer.orbit, 0.0, 1.0, 0.0);
-  glTranslatef(mer.distance, 0.0, 0.0);
-  if (labelsActive == 1) {
-    glRasterPos3f(0.0, 3, 0.0);
-    glColor3ub(255, 255, 255);
-    writeBitmapString(GLUT_BITMAP_HELVETICA_12, "Mercury");
-  }
-  glPushMatrix();
-  glRotatef(mer.axisTilt, 1.0, 0.0, 0.0);
-  glRotatef(mer.axisAni, 0.0, 1.0, 0.0);
-  glRotatef(90.0, 1.0, 0.0, 0.0);
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, merTexture);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  gluQuadricTexture(quadric, 1);
-  gluSphere(quadric, mer.radius, 20.0, 20.0);
-  glDisable(GL_TEXTURE_2D);
-  glPopMatrix();
-  glPopMatrix();
+  drawPlanet(mer, merTexture, "Mercury", quadric);
+  // glPushMatrix();
+  // glRotatef(mer.orbit, 0.0, 1.0, 0.0);
+  // glTranslatef(mer.distance, 0.0, 0.0);
+  // if (labelsActive == 1) {
+  //   glRasterPos3f(0.0, 3, 0.0);
+  //   glColor3ub(255, 255, 255);
+  //   writeBitmapString(GLUT_BITMAP_HELVETICA_12, "Mercury");
+  // }  
+  // glRotatef(mer.axisTilt, 1.0, 0.0, 0.0);
+  // glRotatef(mer.axisAni, 0.0, 1.0, 0.0);
+  // glRotatef(90.0, 1.0, 0.0, 0.0);
+  // glEnable(GL_TEXTURE_2D);
+  // glBindTexture(GL_TEXTURE_2D, merTexture);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  // gluQuadricTexture(quadric, 1);
+  // gluSphere(quadric, mer.radius, 20.0, 20.0);
+  // glDisable(GL_TEXTURE_2D);  
+  // glPopMatrix();
 
   // Venus
   glPushMatrix();
@@ -258,8 +265,7 @@ void drawScene(void) {
     glRasterPos3f(0.0, 3, 0.0);
     glColor3ub(255, 255, 255);
     writeBitmapString(GLUT_BITMAP_HELVETICA_12, "Venus");
-  }
-  glPushMatrix();
+  }  
   glRotatef(ven.axisTilt, 1.0, 0.0, 0.0);
   glRotatef(ven.axisAni, 0.0, 1.0, 0.0);
   glRotatef(90.0, 1.0, 0.0, 0.0);
@@ -269,12 +275,11 @@ void drawScene(void) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   gluQuadricTexture(quadric, 1);
   gluSphere(quadric, ven.radius, 20.0, 20.0);
-  glDisable(GL_TEXTURE_2D);
-  glPopMatrix();
+  glDisable(GL_TEXTURE_2D);  
   glPopMatrix();
 
-  // Earth, Orbit, Moon
-  glPushMatrix();
+  // Earth
+   glPushMatrix();
   glRotatef(ear.orbit, 0.0, 1.0, 0.0);
   glTranslatef(ear.distance, 0.0, 0.0);
   if (labelsActive == 1) {
@@ -302,8 +307,7 @@ void drawScene(void) {
     glRasterPos3f(0.0, 3, 0.0);
     glColor3ub(255, 255, 255);
     writeBitmapString(GLUT_BITMAP_HELVETICA_12, "Mars");
-  }
-  glPushMatrix();
+  }  
   glRotatef(mar.axisTilt, 1.0, 0.0, 0.0);
   glRotatef(mar.axisAni, 0.0, 1.0, 0.0);
   glRotatef(90.0, 1.0, 0.0, 0.0);
@@ -313,8 +317,7 @@ void drawScene(void) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   gluQuadricTexture(quadric, 1);
   gluSphere(quadric, mar.radius, 20.0, 20.0);
-  glDisable(GL_TEXTURE_2D);
-  glPopMatrix();
+  glDisable(GL_TEXTURE_2D);  
   glPopMatrix();
 
   // Jupiter, Orbits, Moons
@@ -325,8 +328,7 @@ void drawScene(void) {
     glRasterPos3f(0.0, 4.4, 0.0);
     glColor3ub(255, 255, 255);
     writeBitmapString(GLUT_BITMAP_HELVETICA_12, "Jupiter");
-  }
-  glPushMatrix();
+  }  
   glRotatef(jup.axisTilt, 1.0, 0.0, 0.0);
   glRotatef(jup.axisAni, 0.0, 1.0, 0.0);
   glRotatef(90.0, 1.0, 0.0, 0.0);
@@ -336,11 +338,10 @@ void drawScene(void) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   gluQuadricTexture(quadric, 1);
   gluSphere(quadric, jup.radius, 20.0, 20.0);
-  glDisable(GL_TEXTURE_2D);
-  glPopMatrix(); 
+  glDisable(GL_TEXTURE_2D);  
   glPopMatrix();
 
-  // Saturn, Orbit, Moon
+  // Saturn
   glPushMatrix();
   glRotatef(sat.orbit, 0.0, 1.0, 0.0);
   glTranslatef(sat.distance, 0.0, 0.0);
@@ -358,20 +359,18 @@ void drawScene(void) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   gluQuadricTexture(quadric, 1);
-  gluSphere(quadric, sat.radius, 20.0, 20.0);
-  glPopMatrix();
+  gluSphere(quadric, sat.radius, 20.0, 20.0);  
   glDisable(GL_TEXTURE_2D);
-  glPushMatrix();
+  glPopMatrix();
   glColor3ub(158, 145, 137);
   glRotatef(-63.0, 1.0, 0.0, 0.0);
   glutWireTorus(0.2, 6.0, 30.0, 30.0);
-  glutWireTorus(0.4, 5.0, 30.0, 30.0);
-  glPopMatrix();  
+  glutWireTorus(0.4, 5.0, 30.0, 30.0);  
   glPopMatrix();
+  
+  //glColor3ub(255, 255, 255);  // FIXES SHADING ISSUE
 
-  glColor3ub(255, 255, 255);  // FIXES SHADING ISSUE
-
-  // Uranus, Orbit, Moon
+  // Uranus
   glPushMatrix();
   glRotatef(ura.orbit, 0.0, 1.0, 0.0);
   glTranslatef(ura.distance, 0.0, 0.0);
@@ -379,8 +378,7 @@ void drawScene(void) {
     glRasterPos3f(0.0, 4.4, 0.0);
     glColor3ub(255, 255, 255);
     writeBitmapString(GLUT_BITMAP_HELVETICA_12, "Uranus");
-  }
-  glPushMatrix();
+  }  
   glRotatef(ura.axisTilt, 1.0, 0.0, 0.0);
   glRotatef(ura.axisAni, 0.0, 1.0, 0.0);
   glRotatef(90.0, 1.0, 0.0, 0.0);
@@ -390,11 +388,10 @@ void drawScene(void) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   gluQuadricTexture(quadric, 1);
   gluSphere(quadric, ura.radius, 20.0, 20.0);
-  glDisable(GL_TEXTURE_2D);
-  glPopMatrix();
+  glDisable(GL_TEXTURE_2D);  
   glPopMatrix();
 
-  // Neptune, Orbit, Moon
+  // Neptune
   glPushMatrix();
   glRotatef(nep.orbit, 0.0, 1.0, 0.0);
   glTranslatef(nep.distance, 0.0, 0.0);
@@ -402,8 +399,7 @@ void drawScene(void) {
     glRasterPos3f(0.0, 4.4, 0.0);
     glColor3ub(255, 255, 255);
     writeBitmapString(GLUT_BITMAP_HELVETICA_12, "Neptune");
-  }
-  glPushMatrix();
+  }  
   glRotatef(nep.axisTilt, 1.0, 0.0, 0.0);
   glRotatef(nep.axisAni, 0.0, 1.0, 0.0);
   glRotatef(90.0, 1.0, 0.0, 0.0);
@@ -413,11 +409,10 @@ void drawScene(void) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   gluQuadricTexture(quadric, 1);
   gluSphere(quadric, nep.radius, 20.0, 20.0);
-  glDisable(GL_TEXTURE_2D);
-  glPopMatrix();
+  glDisable(GL_TEXTURE_2D);  
   glPopMatrix();
 
-  // Pluto, Orbit, Moon
+  // Pluto
   glPushMatrix();
   glRotatef(plu.orbit, 0.0, 1.0, 0.0);
   glTranslatef(plu.distance, 0.0, 0.0);
@@ -425,8 +420,7 @@ void drawScene(void) {
     glRasterPos3f(0.0, 3.0, 0.0);
     glColor3ub(255, 255, 255);
     writeBitmapString(GLUT_BITMAP_HELVETICA_12, "Pluto");
-  }
-  glPushMatrix();
+  }  
   glRotatef(plu.axisTilt, 1.0, 0.0, 0.0);
   glRotatef(plu.axisAni, 0.0, 1.0, 0.0);
   glRotatef(90.0, 1.0, 0.0, 0.0);
@@ -436,8 +430,7 @@ void drawScene(void) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   gluQuadricTexture(quadric, 1);
   gluSphere(quadric, plu.radius, 20.0, 20.0);
-  glDisable(GL_TEXTURE_2D);
-  glPopMatrix();
+  glDisable(GL_TEXTURE_2D);  
   glPopMatrix();
 
 
@@ -475,13 +468,6 @@ void drawScene(void) {
   glutSwapBuffers();
 }
 
-void drawScenesInOrder(void) {
-  if (logoScene == 1) {
-    drawLogoScene();
-  } else {
-    drawScene();
-  }
-}
 
 void resize(int w, int h) {
   glViewport(0, 0, w, h);
@@ -492,7 +478,7 @@ void resize(int w, int h) {
 }
 
 void animate(int n) {
-  if (isAnimate) {
+  if (animation) {
     mer.orbit += mer.orbitSpeed;
     ven.orbit += ven.orbitSpeed;
     ear.orbit += ear.orbitSpeed;
@@ -522,73 +508,24 @@ void animate(int n) {
   }
 }
 
-void mouseControl(int button, int state, int x, int y) {
-  if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
-    if (logoScene) logoScene = 0;
-
-  if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) exit(0);
-  glutPostRedisplay();
-}
-
-void mouseWheel(int wheel, int direction, int x, int y) {
-  if (direction > 0 && zoom < 100) zoom++;
-  if (direction < 0 && zoom > -75) zoom--;
-  glutPostRedisplay();
-}
-
 void keyInput(unsigned char key, int x, int y) {
   switch (key) {
     case 27:
       exit(0);
-      break;
+      break;    
     case ' ':
-      if (isAnimate)
-        isAnimate = 0;
-      else {
-        isAnimate = 1;
-        animate(1);
-      }
+      animation = (animation) ? 0 : 1;
+      if (animation)        
+        animate(1);      
       break;
     case 'o':
-      if (smallOrbitActive)
-        smallOrbitActive = 0;
-      else
-        smallOrbitActive = 1;
-      glutPostRedisplay();
-      break;
     case 'O':
-      if (bigOrbitActive)
-        bigOrbitActive = 0;
-      else
-        bigOrbitActive = 1;
-      glutPostRedisplay();
-      break;
-    case 'm':
-      if (moonsActive)
-        moonsActive = 0;
-      else
-        moonsActive = 1;
-      glutPostRedisplay();
-      break;
-    case 'M':
-      if (moonsActive)
-        moonsActive = 0;
-      else
-        moonsActive = 1;
+      orbitActive = (orbitActive) ? 0 : 1;      
       glutPostRedisplay();
       break;
     case 'l':
-      if (labelsActive)
-        labelsActive = 0;
-      else
-        labelsActive = 1;
-      glutPostRedisplay();
-      break;
     case 'L':
-      if (labelsActive)
-        labelsActive = 0;
-      else
-        labelsActive = 1;
+      labelsActive = (labelsActive) ? 0 : 1;      
       glutPostRedisplay();
       break;
     case '1':
@@ -605,12 +542,9 @@ void keyInput(unsigned char key, int x, int y) {
 void intructions(void) {
   cout << "SPACE to play/pause the simulation." << endl;
   cout << "ESC to exit the simulation." << endl;
-  cout << "O to show/hide Big Orbital Trails." << endl;
-  cout << "o to show/hide Small Orbital Trails." << endl;
-  cout << "M/m to show/hide Moons." << endl;
+  cout << "O/o to show/hide Big Orbital Trails." << endl;    
   cout << "L/l to show/hide labels" << endl;
-  cout << "1 or 2 to change camera angles." << endl;
-  cout << "Scroll to change camera movement" << endl;
+  cout << "1 or 2 to change camera angles." << endl;  
 }
 
 int main(int argc, char** argv) {
@@ -623,15 +557,12 @@ int main(int argc, char** argv) {
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
   glutInitWindowSize(1024, 768);
   glutInitWindowPosition(500, 0);
-  glutCreateWindow("Solar System");
-  glutDisplayFunc(drawScenesInOrder);
-  glutReshapeFunc(resize);
-  glutMouseFunc(mouseControl);
-  glutKeyboardFunc(keyInput);
-  glutMouseWheelFunc(mouseWheel);
+  glutCreateWindow("Solar System");  
+  glutReshapeFunc(resize);  
+  glutKeyboardFunc(keyInput);  
+  glutDisplayFunc(drawScene);
   glewExperimental = GL_TRUE;
-  glewInit();
-
+  glewInit(); 
   setup();
   glutMainLoop();
 }

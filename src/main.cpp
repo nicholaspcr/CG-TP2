@@ -54,16 +54,6 @@ Planet sat(3.0, 37, 0, 0.97, 26.70, 0);    // Saturn
 Planet ura(2.5, 45.5, 0, 0.68, 97.77, 0);  // Uranus
 Planet nep(2.3, 53.6, 0, 0.54, 28.32, 0);  // Neptune
 Planet plu(0.3, 59, 0, 0.47, 119.6, 0);    // Pluto
-Planet lun(.40, 3, 0, 5.40, 0, 0);         // Luna     (Earth)
-Planet pho(.20, 1.8, 0, 2.30, 0, 0);       // Phobos   (Mars)
-Planet dei(.24, 2.4, 0, 3.60, 0, 0);       // Deimos   (Mars)
-Planet eur(.24, 4, 0, 4.40, 0, 0);         // Europa   (Jupiter)
-Planet gan(.24, 4.7, 0, 5.00, 0, 0);       // Ganymede (Jupiter)
-Planet cal(.24, 5.3, 0, 2.30, 0, 0);       // Callisto (Jupiter)
-Planet tit(.75, 3.7, 0, 2.40, 0, 0);       // Titan	   (Saturn)
-Planet nix(.10, 1.5, 0, 5.00, 0, 0);       // Nix	      (Pluto)
-Planet puc(.26, 2.9, 0, 7.00, 0, 0);       // Puck	   (Uranus)
-Planet tri(.36, 3.2, 0, 3.40, 0, 0);       // Triton   (Neptune)
 
 int isAnimate = 0;
 int bigOrbitActive = 1;
@@ -74,8 +64,6 @@ int frameCount = 0;
 int labelsActive = 0;
 int zoom = 50;
 int logoScene = 0;
-
-
 
 // Função dos exemplos
 GLuint carregaTextura(const char* arquivo)
@@ -132,17 +120,17 @@ void setup(void) {
   // TEXUTRING SETUP
   glEnable(GL_NORMALIZE);
   glEnable(GL_COLOR_MATERIAL);  
-  staTexture = carregaTextura("textures/png/stars.png");
-  sunTexture = carregaTextura("textures/png/sun.png");
-  merTexture = carregaTextura("textures/png/mercury.png");  
-  venTexture = carregaTextura("textures/png/venus.png");  
-  earTexture = carregaTextura("textures/png/earth.png");
-  marTexture = carregaTextura("textures/png/mars.png");
-  jupTexture = carregaTextura("textures/png/jupiter.png");  
-  satTexture = carregaTextura("textures/png/saturn.png");  
-  uraTexture = carregaTextura("textures/png/uranus.png");
-  nepTexture = carregaTextura("textures/png/neptune.png");  
-  logTexture = carregaTextura("textures/png/stars.png");
+  staTexture = carregaTextura("../textures/png/stars.png");
+  sunTexture = carregaTextura("../textures/png/sun.png");
+  merTexture = carregaTextura("../textures/png/mercury.png");  
+  venTexture = carregaTextura("../textures/png/venus.png");  
+  earTexture = carregaTextura("../textures/png/earth.png");
+  marTexture = carregaTextura("../textures/png/mars.png");
+  jupTexture = carregaTextura("../textures/png/jupiter.png");  
+  satTexture = carregaTextura("../textures/png/saturn.png");  
+  uraTexture = carregaTextura("../textures/png/uranus.png");
+  nepTexture = carregaTextura("../textures/png/neptune.png");  
+  logTexture = carregaTextura("../textures/png/stars.png");
 
 
   // TODO: isolate
@@ -293,8 +281,7 @@ void drawScene(void) {
     glRasterPos3f(0.0, 3, 0.0);
     glColor3ub(255, 255, 255);
     writeBitmapString(GLUT_BITMAP_HELVETICA_12, "Earth");
-  }
-  glPushMatrix();
+  }  
   glRotatef(ear.axisTilt, 1.0, 0.0, 0.0);
   glRotatef(ear.axisAni, 0.0, 1.0, 0.0);
   glRotatef(90.0, 1.0, 0.0, 0.0);
@@ -305,14 +292,7 @@ void drawScene(void) {
   gluQuadricTexture(quadric, 1);
   gluSphere(quadric, ear.radius, 20.0, 20.0);
   glDisable(GL_TEXTURE_2D);
-  glPopMatrix();
-  if (smallOrbitActive == 1) {
-    lun.drawSmallOrbit();
-  }
-  if (moonsActive == 1) {
-    lun.drawMoon();
-  }
-  glPopMatrix();
+  glPopMatrix();  
 
   // Mars, Orbits, Moons
   glPushMatrix();
@@ -335,14 +315,6 @@ void drawScene(void) {
   gluSphere(quadric, mar.radius, 20.0, 20.0);
   glDisable(GL_TEXTURE_2D);
   glPopMatrix();
-  if (smallOrbitActive == 1) {
-    pho.drawSmallOrbit();
-    dei.drawSmallOrbit();
-  }
-  if (moonsActive == 1) {
-    pho.drawMoon();
-    dei.drawMoon();
-  }
   glPopMatrix();
 
   // Jupiter, Orbits, Moons
@@ -365,17 +337,7 @@ void drawScene(void) {
   gluQuadricTexture(quadric, 1);
   gluSphere(quadric, jup.radius, 20.0, 20.0);
   glDisable(GL_TEXTURE_2D);
-  glPopMatrix();
-  if (smallOrbitActive == 1) {
-    eur.drawSmallOrbit();
-    gan.drawSmallOrbit();
-    cal.drawSmallOrbit();
-  }
-  if (moonsActive == 1) {
-    eur.drawMoon();
-    gan.drawMoon();
-    cal.drawMoon();
-  }
+  glPopMatrix(); 
   glPopMatrix();
 
   // Saturn, Orbit, Moon
@@ -404,13 +366,7 @@ void drawScene(void) {
   glRotatef(-63.0, 1.0, 0.0, 0.0);
   glutWireTorus(0.2, 6.0, 30.0, 30.0);
   glutWireTorus(0.4, 5.0, 30.0, 30.0);
-  glPopMatrix();
-  if (smallOrbitActive == 1) {
-    tit.drawSmallOrbit();
-  }
-  if (moonsActive == 1) {
-    tit.drawMoon();
-  }
+  glPopMatrix();  
   glPopMatrix();
 
   glColor3ub(255, 255, 255);  // FIXES SHADING ISSUE
@@ -436,12 +392,6 @@ void drawScene(void) {
   gluSphere(quadric, ura.radius, 20.0, 20.0);
   glDisable(GL_TEXTURE_2D);
   glPopMatrix();
-  if (smallOrbitActive == 1) {
-    puc.drawSmallOrbit();
-  }
-  if (moonsActive == 1) {
-    puc.drawMoon();
-  }
   glPopMatrix();
 
   // Neptune, Orbit, Moon
@@ -465,12 +415,6 @@ void drawScene(void) {
   gluSphere(quadric, nep.radius, 20.0, 20.0);
   glDisable(GL_TEXTURE_2D);
   glPopMatrix();
-  if (smallOrbitActive == 1) {
-    tri.drawSmallOrbit();
-  }
-  if (moonsActive == 1) {
-    tri.drawMoon();
-  }
   glPopMatrix();
 
   // Pluto, Orbit, Moon
@@ -494,12 +438,6 @@ void drawScene(void) {
   gluSphere(quadric, plu.radius, 20.0, 20.0);
   glDisable(GL_TEXTURE_2D);
   glPopMatrix();
-  if (smallOrbitActive == 1) {
-    nix.drawSmallOrbit();
-  }
-  if (moonsActive == 1) {
-    nix.drawMoon();
-  }
   glPopMatrix();
 
 
@@ -563,21 +501,9 @@ void animate(int n) {
     sat.orbit += sat.orbitSpeed;
     ura.orbit += ura.orbitSpeed;
     nep.orbit += nep.orbitSpeed;
-    plu.orbit += plu.orbitSpeed;
-    lun.orbit += lun.orbitSpeed;
-    pho.orbit += pho.orbitSpeed;
-    dei.orbit += dei.orbitSpeed;
-    eur.orbit += eur.orbitSpeed;
-    gan.orbit += gan.orbitSpeed;
-    cal.orbit += cal.orbitSpeed;
-    tit.orbit += tit.orbitSpeed;
-    nix.orbit += nix.orbitSpeed;
-    puc.orbit += puc.orbitSpeed;
-    tri.orbit += tri.orbitSpeed;
-    if (mer, ven, ear, mar, jup, sat, ura, nep, plu, lun, pho, dei, eur, gan,
-        cal, tit, nix, puc, tri.orbit > 360.0) {
-      mer, ven, ear, mar, jup, sat, ura, nep, plu, lun, pho, dei, eur, gan, cal,
-          tit, nix, puc, tri.orbit -= 360.0;
+    plu.orbit += plu.orbitSpeed;        
+    if (mer, ven, ear, mar, jup, sat, ura, nep, plu.orbit > 360.0) {
+      mer, ven, ear, mar, jup, sat, ura, nep, plu.orbit -= 360.0;
     }
     mer.axisAni += 10.0;
     ven.axisAni += 10.0;

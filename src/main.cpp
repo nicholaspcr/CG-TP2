@@ -1,20 +1,65 @@
-#include <GL/glew.h>
-#include <GL/freeglut.h>
+/*
+ * GLUT Shapes Demo
+ *
+ * Written by Nigel Stewart November 2003
+ *
+ * This program is test harness for the sphere, cone
+ * and torus shapes in GLUT.
+ *
+ * Spinning wireframe and smooth shaded shapes are
+ * displayed until the ESC or q key is pressed.  The
+ * number of geometry stacks and slices can be adjusted
+ * using the + and - keys.
+ */
 
-#include <GL/glext.h>
+
+
+
 #include <SOIL/SOIL.h>
 
-#include <iostream>
+
+
+ #include<GL/glew.h>
+ //#include<GL/glext.h>
+ #include<GL/gl.h>
+
+
+#include <GL/freeglut.h>
+
+//#ifdef __APPLE__
+//#include <GLUT/glut.h>
+//#else
+//#include <GL/glut.h>
+//#endif
+
+
+
+//
+
+
+
 
 #pragma comment(lib, "glew32.lib")
+
+
+
+
+#include <iostream>
+#include <stdlib.h>
+
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
+
+#include "musica.c"
 
 using namespace std;
 
 
-struct planet { 
-  float radius, distance, orbit, orbitSpeed, axisTilt, axisAni;  
+struct planet {
+  float radius, distance, orbit, orbitSpeed, axisTilt, axisAni;
   // default values -> define
-  planet(){    
+  planet(){
     // talvez o sol como o padrão
     radius = 5.0;
     distance = 0.0;
@@ -24,12 +69,12 @@ struct planet {
     axisAni = 0.0;
   }
   planet(
-    float _radius, 
+    float _radius,
     float _distance,
     float _orbit,
     float _orbitSpeed,
     float _axisTilt,
-    float _axisAni) 
+    float _axisAni)
   {
     radius = _radius;
     distance = _distance;
@@ -113,12 +158,12 @@ GLuint carregaTextura(const char* arquivo)
 
     if (texels == nullptr) {
         printf("Erro do SOIL '%s' tentando carregar o arquivo '%s'.\n", SOIL_last_result(), arquivo);
-    }    
+    }
     return idTextura;
 }
 
 // escreve string com glut escreve char
-void writeBitmapString(void* font, string str) {  
+void writeBitmapString(void* font, string str) {
   for(auto ch : str)
     glutBitmapCharacter(font, ch);
 }
@@ -127,25 +172,27 @@ void setup(void) {
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glEnable(GL_DEPTH_TEST);
 
+  tocar_musica("../mus/musTema.ogg", -1);
+
   // Carrega texturas com função do exemplo
   glEnable(GL_NORMALIZE);
-  glEnable(GL_COLOR_MATERIAL);  
-  starsTexture = carregaTextura("../textures/png/stars.png");
-  sunTexture = carregaTextura("../textures/png/sun.png");
-  merTexture = carregaTextura("../textures/png/mercury.png");  
-  venTexture = carregaTextura("../textures/png/venus.png");  
-  earTexture = carregaTextura("../textures/png/earth.png");
-  marTexture = carregaTextura("../textures/png/mars.png");
-  jupTexture = carregaTextura("../textures/png/jupiter.png");  
-  satTexture = carregaTextura("../textures/png/saturn.png");  
-  uraTexture = carregaTextura("../textures/png/uranus.png");
-  nepTexture = carregaTextura("../textures/png/neptune.png");  
-  logTexture = carregaTextura("../textures/png/stars.png");
+  glEnable(GL_COLOR_MATERIAL);
+  starsTexture = carregaTextura("/home/user/CG-TP2/testecompilar/textures/png/stars.png");
+  sunTexture = carregaTextura("/home/user/CG-TP2/testecompilar/textures/png/sun.png");
+  merTexture = carregaTextura("/home/user/CG-TP2/testecompilar/textures/png/mercury.png");
+  venTexture = carregaTextura("/home/user/CG-TP2/testecompilar/textures/png/venus.png");
+  earTexture = carregaTextura("/home/user/CG-TP2/testecompilar/textures/png/earth.png");
+  marTexture = carregaTextura("/home/user/CG-TP2/testecompilar/textures/png/mars.png");
+  jupTexture = carregaTextura("/home/user/CG-TP2/testecompilar/textures/png/jupiter.png");
+  satTexture = carregaTextura("/home/user/CG-TP2/testecompilar/textures/png/saturn.png");
+  uraTexture = carregaTextura("/home/user/CG-TP2/testecompilar/textures/png/uranus.png");
+  nepTexture = carregaTextura("/home/user/CG-TP2/testecompilar/textures/png/neptune.png");
+  logTexture = carregaTextura("/home/user/CG-TP2/testecompilar/textures/png/stars.png");
 
-  // Reference: https://www.cse.msu.edu/~cse872/tutorial3.html  
+  // Reference: https://www.cse.msu.edu/~cse872/tutorial3.html
   GLfloat sunLight[] = {.75, .75, 3.25, 0};
-  glEnable(GL_LIGHTING);  
-  glEnable(GL_LIGHT0);  
+  glEnable(GL_LIGHTING);
+  glEnable(GL_LIGHT0);
   glLightfv(GL_LIGHT0, GL_POSITION, sunLight);
 
 
@@ -174,7 +221,7 @@ void drawTrails(void) {
   glPopMatrix();
 }
 
-void drawPlanet(planet p, GLuint texture, string planetName, GLUquadric *quad){  
+void drawPlanet(planet p, GLuint texture, string planetName, GLUquadric *quad){
   glPushMatrix();
   glRotatef(p.orbit, 0.0, 1.0, 0.0);
   glTranslatef(p.distance, 0.0, 0.0);
@@ -182,7 +229,7 @@ void drawPlanet(planet p, GLuint texture, string planetName, GLUquadric *quad){
     glRasterPos3f(-1.2, 6.0, 0.0);
     glColor3ub(255, 255, 255);
     writeBitmapString(GLUT_BITMAP_HELVETICA_12, planetName);
-  }  
+  }
   glRotatef(p.axisTilt, 1.0, 0.0, 0.0);
   glRotatef(p.axisAni, 0.0, 1.0, 0.0);
   glRotatef(90.0, 1.0, 0.0, 0.0);
@@ -192,7 +239,7 @@ void drawPlanet(planet p, GLuint texture, string planetName, GLUquadric *quad){
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   gluQuadricTexture(quad, 1);
   gluSphere(quad, p.radius, 20.0, 20.0);
-  glDisable(GL_TEXTURE_2D);  
+  glDisable(GL_TEXTURE_2D);
   glPopMatrix();
 }
 
@@ -209,7 +256,7 @@ void drawScene(void) {
   if (orbitActive == 1) drawTrails();
 
   if (!lightsActive){
-    glDisable(GL_LIGHT0);    
+    glDisable(GL_LIGHT0);
   }else{
     glEnable(GL_LIGHT0);
   }
@@ -237,7 +284,7 @@ void drawScene(void) {
   // Pluto
   drawPlanet(plu, pluTexture, "Pluto", quadric);
 
-  
+
   // Stars - > TODO: review
   glPushMatrix();
   glEnable(GL_TEXTURE_2D);
@@ -292,7 +339,7 @@ void animate(int n) {
     sat.orbit += sat.orbitSpeed;
     ura.orbit += ura.orbitSpeed;
     nep.orbit += nep.orbitSpeed;
-    plu.orbit += plu.orbitSpeed;        
+    plu.orbit += plu.orbitSpeed;
     if (mer, ven, ear, mar, jup, sat, ura, nep, plu.orbit > 360.0) {
       mer, ven, ear, mar, jup, sat, ura, nep, plu.orbit -= 360.0;
     }
@@ -317,11 +364,11 @@ void keyInput(unsigned char key, int x, int y) {
   switch (key) {
     case 27:
       exit(0);
-      break;    
+      break;
     case ' ':
       animation = (animation) ? 0 : 1;
-      if (animation)        
-        animate(1);      
+      if (animation)
+        animate(1);
       break;
     case 'n':
     case 'N':
@@ -330,12 +377,12 @@ void keyInput(unsigned char key, int x, int y) {
       break;
     case 'o':
     case 'O':
-      orbitActive = (orbitActive) ? 0 : 1;      
+      orbitActive = (orbitActive) ? 0 : 1;
       glutPostRedisplay();
       break;
     case 'l':
     case 'L':
-      labelsActive = (labelsActive) ? 0 : 1;      
+      labelsActive = (labelsActive) ? 0 : 1;
       glutPostRedisplay();
       break;
     case '1':
@@ -345,34 +392,34 @@ void keyInput(unsigned char key, int x, int y) {
     case '2':
       changeCamera = 1;
       glutPostRedisplay();
-      break;    
+      break;
   }
 }
 
 void intructions(void) {
   cout << "SPACE to play/pause the simulation." << endl;
   cout << "ESC to exit the simulation." << endl;
-  cout << "O/o to show/hide Big Orbital Trails." << endl;    
+  cout << "O/o to show/hide Big Orbital Trails." << endl;
   cout << "L/l to show/hide labels" << endl;
-  cout << "1 or 2 to change camera angles." << endl;  
+  cout << "1 or 2 to change camera angles." << endl;
 }
 
 int main(int argc, char** argv) {
   intructions();
   glutInit(&argc, argv);
 
-  glutInitContextVersion(4, 2);
+  //glutInitContextVersion(4, 2);
   glutInitContextProfile(GLUT_COMPATIBILITY_PROFILE);
 
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
   glutInitWindowSize(1024, 768);
   glutInitWindowPosition(500, 0);
-  glutCreateWindow("Solar System");  
-  glutReshapeFunc(resize);  
-  glutKeyboardFunc(keyInput);  
+  glutCreateWindow("Solar System");
+  glutReshapeFunc(resize);
+  glutKeyboardFunc(keyInput);
   glutDisplayFunc(drawScene);
   glewExperimental = GL_TRUE;
-  glewInit(); 
+  glewInit();
   setup();
   glutMainLoop();
 }

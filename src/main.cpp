@@ -143,7 +143,7 @@ void setup(void) {
   logTexture = carregaTextura("../textures/png/stars.png");
 
   // Reference: https://www.cse.msu.edu/~cse872/tutorial3.html  
-  GLfloat sunLight[] = {.75, .75, 3.25, 0};
+  GLfloat sunLight[] = {sun.distance, 0, 1, 0};
   glEnable(GL_LIGHTING);  
   glEnable(GL_LIGHT0);  
   glLightfv(GL_LIGHT0, GL_POSITION, sunLight);
@@ -162,15 +162,15 @@ void drawTrails(void) {
   glColor3ub(255, 255, 255);
   glTranslatef(0.0, 0.0, 0.0);
   glRotatef(90.0, 1.0, 0.0, 0.0);
-  glutWireTorus(1e-8, mer.distance, 50.0, 50.0);
-  glutWireTorus(1e-8, ven.distance, 50.0, 50.0);
-  glutWireTorus(1e-8, ear.distance, 50.0, 50.0);
-  glutWireTorus(1e-8, mar.distance, 50.0, 50.0);
-  glutWireTorus(1e-8, jup.distance, 50.0, 50.0);
-  glutWireTorus(1e-8, sat.distance, 50.0, 50.0);
-  glutWireTorus(1e-8, ura.distance, 50.0, 50.0);
-  glutWireTorus(1e-8, nep.distance, 50.0, 50.0);
-  glutWireTorus(1e-8, plu.distance, 50.0, 50.0);
+  glutWireTorus(1e-8, mer.distance, 0, 50.0);
+  glutWireTorus(1e-8, ven.distance, 0, 50.0);
+  glutWireTorus(1e-8, ear.distance, 0, 50.0);
+  glutWireTorus(1e-8, mar.distance, 0, 50.0);
+  glutWireTorus(1e-8, jup.distance, 0, 50.0);
+  glutWireTorus(1e-8, sat.distance, 0, 50.0);
+  glutWireTorus(1e-8, ura.distance, 0, 50.0);
+  glutWireTorus(1e-8, nep.distance, 0, 50.0);
+  glutWireTorus(1e-8, plu.distance, 0, 50.0);
   glPopMatrix();
 }
 
@@ -228,8 +228,7 @@ void drawScene(void) {
   // Jupiter
   drawPlanet(jup, jupTexture, "Jupiter", quadric);
   // Saturn
-  drawPlanet(sat, satTexture, "Saturn", quadric);
-  //glColor3ub(255, 255, 255);  // FIXES SHADING ISSUE
+  drawPlanet(sat, satTexture, "Saturn", quadric);  
   // Uranus
   drawPlanet(ura, uraTexture, "Uranus", quadric);
   // Neptune

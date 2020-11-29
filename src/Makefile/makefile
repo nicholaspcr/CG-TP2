@@ -1,5 +1,5 @@
 CC=g++
-OPCOES_COMPILADOR=-I. -lSOIL -lglut -lGLU -lGLEW -lGL -std=c++14
+OPCOES_COMPILADOR=-I. -lSOIL -lglut -lGLU -lGLEW -lGL -std=c++14 -lSDL2main -lSDL2 -lSDL2_mixer
 TODOS_ARQUIVOS_PONTOH = 
 TODOS_ARQUIVOS_OBJ = main.o  
 

@@ -126,8 +126,9 @@ GLuint carregaTextura(const char* arquivo)
 
 // escreve string com glut escreve char
 void writeBitmapString(void* font, string str) {
-  for(auto ch : str)
+  for(auto ch : str){
     glutBitmapCharacter(font, ch);
+  }
 }
 
 void setup(void) {
@@ -226,25 +227,25 @@ void drawScene(void) {
 
   GLUquadric* quadric = gluNewQuadric();
   // Sun
-  drawPlanet(sun, sunTexture, "Sun", quadric);
+  drawPlanet(sun, sunTexture, "Sol", quadric);
   // Mercury
-  drawPlanet(mer, merTexture, "Mercury", quadric);
+  drawPlanet(mer, merTexture, "Mercurio", quadric);
   // Venus
   drawPlanet(ven, venTexture, "Venus", quadric);
   // Earth
-  drawPlanet(ear, earTexture, "Earth", quadric);
+  drawPlanet(ear, earTexture, "Terra", quadric);
   // Mars
-  drawPlanet(mar, marTexture, "Mars", quadric);
+  drawPlanet(mar, marTexture, "Marte", quadric);
   // Jupiter
   drawPlanet(jup, jupTexture, "Jupiter", quadric);
   // Saturn
-  drawPlanet(sat, satTexture, "Saturn", quadric);
+  drawPlanet(sat, satTexture, "Saturno", quadric);
   // Uranus
-  drawPlanet(ura, uraTexture, "Uranus", quadric);
+  drawPlanet(ura, uraTexture, "Urano", quadric);
   // Neptune
-  drawPlanet(nep, nepTexture, "Neptune", quadric);
+  drawPlanet(nep, nepTexture, "Netuno", quadric);
   // Pluto
-  drawPlanet(plu, pluTexture, "Pluto", quadric);
+  drawPlanet(plu, pluTexture, "Plutao", quadric);
 
 
   // Stars - > TODO: review
@@ -359,11 +360,13 @@ void keyInput(unsigned char key, int x, int y) {
 }
 
 void intructions(void) {
-  cout << "SPACE to play/pause the simulation." << endl;
-  cout << "ESC to exit the simulation." << endl;
-  cout << "O/o to show/hide Big Orbital Trails." << endl;
-  cout << "L/l to show/hide labels" << endl;
-  cout << "1 or 2 to change camera angles." << endl;
+  cout << "************* CONFIGURACAO DE TECLAS ****************\n" << endl;
+  cout << "\tESPACO pausa ou inicia a simulacao" << endl;
+  cout << "\tESC para sair" << endl;
+  cout << "\tO/o oculta ou mostra as orbitas dos planetas" << endl;
+  cout << "\tL/l para ocultar ou mostar os nomes dos planetas" << endl;
+  cout << "\t1 e 2 altenam entre as cameras\n" << endl;
+  cout << "****************************************************" << endl;
 }
 
 int main(int argc, char** argv) {
@@ -376,7 +379,7 @@ int main(int argc, char** argv) {
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
   glutInitWindowSize(1024, 768);
   glutInitWindowPosition(500, 0);
-  glutCreateWindow("Solar System");
+  glutCreateWindow("Sistema Solar");
   glutReshapeFunc(resize);
   glutKeyboardFunc(keyInput);
   glutDisplayFunc(drawScene);

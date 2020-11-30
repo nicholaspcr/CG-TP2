@@ -8,3 +8,8 @@ TP2 do trabalho de Computação Gráfica
 - Fúlvio
 - Nicholas
 - Thiago (Bahia)
+
+
+### Instruções
+
+- Para executar, utilize o comando 'make run' no diretório 'Makefile'

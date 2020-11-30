@@ -1,4 +1,4 @@
-# CG-TP2
+# Sistema Solar
 
 TP2 do trabalho de Computação Gráfica
 

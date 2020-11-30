@@ -12,4 +12,4 @@ TP2 do trabalho de Computação Gráfica
 
 ### Instruções
 
-- Para executar, utilize o comando 'make run' no diretório 'Makefile'
+- Para executar, utilize o comando 'make run' no diretório '../src/Makefile'

@@ -2,10 +2,9 @@
 
 TP2 do trabalho de Computação Gráfica
 
-### TODO
+### Integrantes
 
-- Esfera
-- Lights
-- Cameras
-  - Você deve usar projeção perspectiva via glFrustum ou gluPerspective
-- Movimento
+- Diógenes
+- Fúlvio
+- Nicholas
+- Thiago (Bahia)
